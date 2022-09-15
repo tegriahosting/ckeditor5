@@ -11,7 +11,7 @@ const path = require( 'path' );
 const webpack = require( 'webpack' );
 const { styles } = require( '@ckeditor/ckeditor5-dev-utils' );
 const CKEditorWebpackPlugin = require( '@ckeditor/ckeditor5-dev-webpack-plugin' );
-const UglifyJsWebpackPlugin = require( 'uglifyjs-webpack-plugin' );
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
 	// To enable sourcemap, uncomment this line.
@@ -26,33 +26,22 @@ module.exports = {
 	},
 
 	optimization: {
-		minimizer: [
-			new UglifyJsWebpackPlugin( {
-				// To enable sourcemap, uncomment this line.
-				// sourceMap: true,
-				uglifyOptions: {
-					output: {
-						// Preserve CKEditor 5 license comments.
-						comments: /^!/
-					}
-				}
-			} )
-		]
+		minimize: true,
+		minimizer: [new TerserPlugin()],
 	},
-
+	devServer: {
+		static: {
+		  directory: path.join(__dirname, 'public'),
+		},
+		compress: true,
+		port: 9000,
+	},
 	plugins: [
 		new CKEditorWebpackPlugin( {
 			// UI language. Language codes follow the https://en.wikipedia.org/wiki/ISO_639-1 format.
 			// When changing the built-in language, remember to also change it in the editor configuration (src/ckeditor.js).
 			language: 'en',
 			additionalLanguages: 'all'
-		} ),
-		new webpack.BannerPlugin( {
-			banner: [
-				'CKEditor 5 with collaboration features is licensed only under a commercial license and is protected by copyright law.',
-				'For more details about available licensing options please contact us at' +
-				' https://ckeditor.com/contact/.'
-			].join( '\n' )
 		} )
 	],
 

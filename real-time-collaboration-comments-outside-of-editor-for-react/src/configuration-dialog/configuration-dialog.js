@@ -225,8 +225,8 @@ function getStoredConfig() {
 	const config = JSON.parse( localStorage.getItem( LOCAL_STORAGE_KEY ) || '{}' );
 
 	return {
-		tokenUrl: config.tokenUrl || '',
+		tokenUrl: config.tokenUrl || 'https://92239.cke-cs.com/token/dev/ccXk0A5aIBBVjxR9ghn7Xq7gPNfRiEr5Eyab?limit=10',
 		ckboxTokenUrl: config.ckboxTokenUrl || '',
-		webSocketUrl: config.webSocketUrl || ''
+		webSocketUrl: config.webSocketUrl || 'wss://92239.cke-cs.com/ws'
 	};
 }

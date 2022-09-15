@@ -10,10 +10,10 @@
     "@ckeditor/ckeditor5-autoformat": "^35.1.0",
     "@ckeditor/ckeditor5-basic-styles": "^35.1.0",
     "@ckeditor/ckeditor5-block-quote": "^35.1.0",
+    "@ckeditor/ckeditor5-ckbox": "^35.1.0",
     "@ckeditor/ckeditor5-cloud-services": "^35.1.0",
     "@ckeditor/ckeditor5-comments": "^35.1.0",
     "@ckeditor/ckeditor5-core": "^35.1.0",
-    "@ckeditor/ckeditor5-ckbox": "^35.1.0",
     "@ckeditor/ckeditor5-editor-classic": "^35.1.0",
     "@ckeditor/ckeditor5-essentials": "^35.1.0",
     "@ckeditor/ckeditor5-font": "^35.1.0",
@@ -52,9 +52,9 @@
     "raw-loader": "^4.0.2",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.3.0",
-    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^5.73.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.0"
   },
   "engines": {
     "node": ">=14.0.0",
@@ -62,6 +62,7 @@
   },
   "scripts": {
     "build": "webpack --mode production",
-    "serve": "webpack --watch"
+    "serve": "webpack --watch",
+    "start": "webpack serve --open --mode=development"
   }
 }
