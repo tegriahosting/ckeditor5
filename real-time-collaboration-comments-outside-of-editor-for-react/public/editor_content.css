@@ -1,0 +1,522 @@
+/* stylelint-disable no-descending-specificity */
+/* stylelint-disable selector-type-no-unknown */
+
+/* NOTE!!
+
+   If you modify this file, you have to rerun:
+
+   npm run copy-tinymce
+
+*/
+
+/* Styles for the editor.
+   Note, use #tinymce for the tinymce editor, and #tinymce-rendered for anywhere we display
+   that html content.
+ */
+
+#tinymce img,
+#tinymce-rendered img {
+  max-width: 100%;
+}
+
+#tinymce p,
+#tinymce-rendered p {
+  margin: 0;
+}
+
+.tox-editor-container {
+  min-height: 70px;
+}
+
+.tox-tinymce-aux {
+  /* See theme.tsx.  Keep above modal, but below the snackbar and tooltip */
+  z-index: 21550 !important;
+}
+
+.tox.tox-tinymce.tox-fullscreen {
+  /* See theme.tsx.  Keep below modal, but below the drawer */
+  z-index: 21250 !important;
+}
+
+.tox-dialog-wrap {
+  /* slightly below tox-tinymce-aux  but above modal in theme.tsx */
+  z-index: 21540 !important;
+}
+
+/* Users paste lists from word, and lists that look visually as one list, can come across as
+   actually been multiple lists.
+   So set the margin around a list to 0, to acheive the same look.
+   */
+#tinymce ul,
+#tinymce ol,
+#tinymce-rendered ul,
+#tinymce-rendered ol {
+  margin: 0;
+}
+
+figcaption {
+  font-style: italic;
+}
+
+#tinymce li.li-arrow,
+#tinymce-rendered li.li-arrow {
+  list-style-type: "→ ";
+}
+
+/* User uploaded videos */
+#tinymce video,
+#tinymce-rendered video {
+  width: 50%;
+  margin: 10px 25%;
+}
+
+/* Style links with an external link icon for external links, and
+ *  remove underline for internal links (except on hover.
+ *
+ *  Note we could have used the internal-link and external-link css classes here instead
+ */
+#tinymce a,
+#tinymce-rendered a {
+  text-decoration: none;
+}
+
+#tinymce a:hover,
+#tinymce-rendered a:hover {
+  text-decoration: underline !important;
+}
+
+#tinymce a[href^="http"],
+#tinymce a[href^="https"],
+#tinymce-rendered a[href^="http"],
+#tinymce-rendered a[href^="https"] {
+  text-decoration: underline;
+}
+
+/*  having a nice icon after external links was nice, but was showing up
+    when we had links inside of actions */
+
+/* #tinymce a[href^="http"]::after,
+#tinymce a[href^="https"]::after,
+#tinymce-rendered a[href^="http"]::after,
+#tinymce-rendered a[href^="https"]::after {
+  content: "";
+  width: 11px;
+  height: 11px;
+  margin-left: 4px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z'/%3E%3Cpath fill-rule='evenodd' d='M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z'/%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: inline-block;
+} */
+
+action {
+  /* Adding a padding like:
+     padding: 5px 0;
+     makes the background color of actions bigger, which look visually a bit nice.
+     But the trouble is that you can then click this background to open and close the action.
+     See makeEditorActionsClickable() function in utils.
+     So instead we have to keep the padding 0.
+   */
+  margin: 0 -2px 0 14px;
+  border-radius: 5px;
+  outline: none !important;
+  text-decoration: none;
+  font-weight: normal;
+  font-style: normal;
+  color: black;
+
+  /*
+     1. We want the icon not move when we hover over it.
+     2. We want it to be a block so that text-decoration: none works, so we don't
+     inherit underline etc.
+     3. We want it possible for the icon to be inline - in the middle of a sentence.
+
+     inline: Does 1,3
+     inline-block: Does 2,3
+
+     I went with inline here, then make actioncontent inline-block.
+   */
+  display: inline-flex;
+}
+
+action * {
+  background: inherit;
+}
+
+actioncontent {
+  text-decoration: none;
+  outline: none !important;
+
+  /* Don't put 'display' here - see belo' */
+}
+
+actioncontent:empty::before {
+  content: "Add content to the action";
+  color: gray;
+}
+
+action:hover,
+action.open {
+  margin: 0 6px 0 14px;
+}
+
+action > actioncontent {
+  display: none;
+  margin-right: 4px;
+  margin-top: 2px;
+}
+
+action:hover > actioncontent {
+  opacity: 1;
+  position: absolute;
+  margin-left: 10px;
+  margin-top: -5px;
+  padding: 5px 7px 5px 5px;
+}
+
+action.open > actioncontent {
+  opacity: 1;
+  margin-bottom: 2px;
+  margin-left: 0;
+  margin-top: 0;
+  position: relative;
+  padding: unset;
+}
+
+.mce-content-body.dragging action:hover,
+.mce-content-body.dragging action {
+  cursor: no-drop !important;
+}
+
+.mce-content-body.dragging action:hover > actioncontent {
+  display: none !important;
+}
+
+action:hover > actioncontent,
+action.open > actioncontent {
+  display: inline-block;
+  border-radius: 5px;
+  z-index: 1;
+}
+
+action::before {
+  display: inline;
+  cursor: pointer;
+  position: relative;
+
+  /* Move into the space that we created for this in action above.
+     We have a width of 20px, so this centers us on background. */
+  top: 4px;
+  left: -10px;
+  margin-right: -5px;
+}
+
+action::after {
+  position: relative;
+  right: -15px;
+  bottom: 0;
+  font-weight: 700;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+action.open::after {
+  content: "✕";
+  margin-left: -12px !important;
+  padding: 0 9px 0 0 !important;
+  margin-right: 15px;
+}
+
+#tinymce action {
+  margin: 0 0 0 14px !important;
+
+  /* When in the editor, don't add the padding because it causes rendering problems */
+  padding: 0 !important;
+
+  /* Invisible border for hover/select in editor */
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+#tinymce action > actioncontent {
+  pointer-events: none;
+  padding: 5px 7px;
+}
+
+#tinymce action.open > actioncontent {
+  pointer-events: none;
+  padding: unset;
+}
+
+#tinymce action.open:hover > actioncontent {
+  border: none !important;
+}
+
+/* choosingwisely */
+
+action[type="choosingwisely"]::before {
+  content: url("/icon_choosingwisely.svg");
+}
+
+action[type="choosingwisely"]:hover,
+action[type="choosingwisely"].open,
+action[type="choosingwisely"] > actioncontent,
+action[type="choosingwisely"]::after {
+  background: #e6f1f8;
+}
+
+action[type="choosingwisely"]::after {
+  color: #046caa;
+}
+
+#tinymce action[type="choosingwisely"]:hover > actioncontent {
+  border: 1px solid #046caa;
+  box-shadow: 0 0 6px #e6f1f8;
+}
+
+#tinymce action[type="choosingwisely"].open:hover {
+  border: 1px solid #046caa;
+}
+
+/* digitalhealth */
+
+action[type="digitalhealth"]::before {
+  content: url("/icon_digitalhealth.svg");
+}
+
+action[type="digitalhealth"]:hover,
+action[type="digitalhealth"].open,
+action[type="digitalhealth"] > actioncontent,
+action[type="digitalhealth"]::after {
+  background: #e8f7ff;
+}
+
+action[type="digitalhealth"]::after {
+  color: #12618d;
+}
+
+#tinymce action[type="digitalhealth"]:hover > actioncontent {
+  border: 1px solid #12618d;
+  box-shadow: 0 0 6px #e8f7ff;
+}
+
+#tinymce action[type="digitalhealth"].open:hover {
+  border: 1px solid #12618d;
+}
+
+/* healthequity */
+
+action[type="healthequity"]::before {
+  content: url("/icon_healthequity.svg");
+}
+
+action[type="healthequity"]:hover,
+action[type="healthequity"].open,
+action[type="healthequity"] > actioncontent,
+action[type="healthequity"]::after {
+  background: #f6ebff;
+}
+
+action[type="healthequity"]::after {
+  color: #6000ac;
+}
+
+#tinymce action[type="healthequity"]:hover > actioncontent {
+  border: 1px solid #6000ac;
+  box-shadow: 0 0 6px #f6ebff;
+}
+
+#tinymce action[type="healthequity"].open:hover {
+  border: 1px solid #6000ac;
+}
+
+/* info */
+
+action[type="info"]::before {
+  content: url("/icon_info.svg");
+}
+
+action[type="info"]:hover,
+action[type="info"].open,
+action[type="info"] > actioncontent,
+action[type="info"]::after {
+  background: #eff8fd;
+}
+
+action[type="info"]::after {
+  color: #083d5a;
+}
+
+#tinymce action[type="info"]:hover > actioncontent {
+  border: 1px solid #083d5a;
+  box-shadow: 0 0 6px #eff8fd;
+}
+
+#tinymce action[type="info"].open:hover {
+  border: 1px solid #083d5a;
+}
+
+/* integrativemedicine */
+
+action[type="integrativemedicine"]::before {
+  content: url("/icon_integrativemedicine.svg");
+}
+
+action[type="integrativemedicine"]:hover,
+action[type="integrativemedicine"].open,
+action[type="integrativemedicine"] > actioncontent,
+action[type="integrativemedicine"]::after {
+  background: #e3fff8;
+}
+
+action[type="integrativemedicine"]::after {
+  color: #00634c;
+}
+
+#tinymce action[type="integrativemedicine"]:hover > actioncontent {
+  border: 1px solid #00634c;
+  box-shadow: 0 0 6px #e3fff8;
+}
+
+#tinymce action[type="integrativemedicine"].open:hover {
+  border: 1px solid #00634c;
+}
+
+/* redflag */
+
+action[type="redflag"]::before {
+  content: url("/icon_redflag.svg");
+}
+
+action[type="redflag"]:hover,
+action[type="redflag"].open,
+action[type="redflag"] > actioncontent,
+action[type="redflag"]::after {
+  background: #fff3f3;
+}
+
+action[type="redflag"]::after {
+  color: #cd0000;
+}
+
+#tinymce action[type="redflag"]:hover > actioncontent {
+  border: 1px solid #cd0000;
+  box-shadow: 0 0 6px #fff3f3;
+}
+
+#tinymce action[type="redflag"].open:hover {
+  border: 1px solid #cd0000;
+}
+
+/* reference */
+
+action[type="reference"]::before {
+  content: url("/icon_reference.svg");
+}
+
+action[type="reference"]:hover,
+action[type="reference"].open,
+action[type="reference"] > actioncontent,
+action[type="reference"]::after {
+  background: #ebebeb;
+}
+
+action[type="reference"]::after {
+  color: #000000;
+}
+
+#tinymce action[type="reference"]:hover > actioncontent {
+  border: 1px solid #000000;
+  box-shadow: 0 0 6px #ebebeb;
+}
+
+#tinymce action[type="reference"].open:hover {
+  border: 1px solid #000000;
+}
+
+/* resourcelimited */
+
+action[type="resourcelimited"]::before {
+  content: url("/icon_resourcelimited.svg");
+}
+
+action[type="resourcelimited"]:hover,
+action[type="resourcelimited"].open,
+action[type="resourcelimited"] > actioncontent,
+action[type="resourcelimited"]::after {
+  background: #fff3f3;
+}
+
+action[type="resourcelimited"]::after {
+  color: #b23333;
+}
+
+#tinymce action[type="resourcelimited"]:hover > actioncontent {
+  border: 1px solid #b23333;
+  box-shadow: 0 0 6px #fff3f3;
+}
+
+#tinymce action[type="resourcelimited"].open:hover {
+  border: 1px solid #b23333;
+}
+
+/* valuebasedcare */
+
+action[type="valuebasedcare"]::before {
+  content: url("/icon_valuebasedcare.svg");
+}
+
+action[type="valuebasedcare"]:hover,
+action[type="valuebasedcare"].open,
+action[type="valuebasedcare"] > actioncontent,
+action[type="valuebasedcare"]::after {
+  background: #eeefff;
+}
+
+action[type="valuebasedcare"]::after {
+  color: #10157d;
+}
+
+#tinymce action[type="valuebasedcare"]:hover > actioncontent {
+  border: 1px solid #10157d;
+  box-shadow: 0 0 6px #eeefff;
+}
+
+#tinymce action[type="valuebasedcare"].open:hover {
+  border: 1px solid #10157d;
+}
+
+/* yellowflag */
+
+action[type="yellowflag"]::before {
+  content: url("/icon_yellowflag.svg");
+}
+
+action[type="yellowflag"]:hover,
+action[type="yellowflag"].open,
+action[type="yellowflag"] > actioncontent,
+action[type="yellowflag"]::after {
+  background: #fffdea;
+}
+
+action[type="yellowflag"]::after {
+  color: #f5e44c;
+}
+
+#tinymce action[type="yellowflag"]:hover > actioncontent {
+  border: 1px solid #f5e44c;
+  box-shadow: 0 0 6px #fffdea;
+}
+
+#tinymce action[type="yellowflag"].open:hover {
+  border: 1px solid #f5e44c;
+}
+
+/* NOTE!!
+
+   If you modify this file, you have to rerun:
+
+   npm run copy-tinymce
+
+*/

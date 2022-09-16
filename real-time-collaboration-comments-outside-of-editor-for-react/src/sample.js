@@ -6,7 +6,14 @@
 import React from 'react';
 import { CKEditor, CKEditorContext } from '@ckeditor/ckeditor5-react';
 import EditorClassicBuild from './editor/ckeditor';
-import Header from './header';
+
+import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
+import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
+import Heading from '@ckeditor/ckeditor5-heading/src/heading';
+import List from '@ckeditor/ckeditor5-list/src/list';
+import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
+import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
+import ActionPlugin from './ActionPlugin.js';
 
 export default class Sample extends React.Component {
 	state = {
@@ -57,7 +64,9 @@ export default class Sample extends React.Component {
 			initialData: this.getInitialData(),
 			collaboration: {
 				channelId: this.state.channelId + '-editor1'
-			}
+			},
+			plugins: [ Heading, List, Paragraph, Bold, Italic, Essentials, ActionPlugin ],
+			toolbar: [ 'heading', 'bold', 'italic', 'numberedList', 'bulletedList', '|', 'action' ]
 		};
 
 		const editorConfig2 = {

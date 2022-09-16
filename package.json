@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@ckeditor/ckeditor5-basic-styles": "^35.1.0"
+  }
+}
