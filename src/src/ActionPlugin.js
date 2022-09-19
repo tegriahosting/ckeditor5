@@ -45,7 +45,16 @@ function createRandomId() {
  *       </action>
  */
 class ActionCommand extends Command {
-    // This gets called when you insert an action (flag icon)
+    /** This gets called when you insert an action (flag icon)
+     *
+     *  Creates: (3) Internal representation ('model'):
+     *
+     *       <action id="6203058534499425" type="redflag">
+     *         (selection)
+     *       </action>
+     *
+     * @param {{type:string, tooltip: string, color: string}}
+     */
     execute( { type, tooltip, color } ) {
         console.log('excute!', type, tooltip, color);
         const editor = this.editor;
@@ -55,7 +64,6 @@ class ActionCommand extends Command {
             console.log('selection is', selection, Object.fromEntries(selection.getAttributes()));
 
             const frag = editor.model.getSelectedContent( selection );
-            console.log('items is', frag);
 
             // Create a <action> element with the "type" attribute (and all the selection attributes)...
             const action = writer.createElement( 'action', {
@@ -64,7 +72,7 @@ class ActionCommand extends Command {
             } );
 
             // ... and insert it into the document.
-            // action.insertContent(writer.cloneElement(items, true));
+            writer.append( frag, action );
             editor.model.insertContent( action );
 
 
@@ -251,23 +259,18 @@ class ActionEditing extends Plugin {
             const color = modelItem.getAttribute( 'color' );
             const tooltip = modelItem.getAttribute( 'tooltip' );
 
+            let child;
+            if (!isEditing) {
+                child = [
+                    viewWriter.createContainerElement( 'actioncontent', {
+                        type, color, tooltip, class: 'actionNonEditable', id: createRandomId()
+                    } )
+                ];
+            }
+
             const actionView = viewWriter.createContainerElement( 'action', {
                 type, color, tooltip, class: 'actionNonEditable', id: createRandomId()
-            } );
-
-
-            // Insert the action type (as a text).
-            const innerText = viewWriter.createText( '{' + type + '}' );
-
-            if (!isEditing) {
-                const actionContentView = viewWriter.createContainerElement( 'actioncontent', {
-                    type, color, tooltip, class: 'actionNonEditable', id: createRandomId()
-                } );
-                viewWriter.insert( viewWriter.createPositionAt( actionView, 0 ), actionContentView );
-                viewWriter.insert( viewWriter.createPositionAt( actionContentView, 0 ), innerText );
-            } else {
-                viewWriter.insert( viewWriter.createPositionAt( actionView, 0 ), innerText );
-            }
+            }, child );
 
             return actionView;
         }
