@@ -6,7 +6,6 @@ import Command from '@ckeditor/ckeditor5-core/src/command';
 import { addListToDropdown, createDropdown } from '@ckeditor/ckeditor5-ui/src/dropdown/utils';
 import Collection from '@ckeditor/ckeditor5-utils/src/collection';
 import Model from '@ckeditor/ckeditor5-ui/src/model';
-
 export default class ActionPlugin extends Plugin {
     static get requires() {
         return [ ActionEditing, ActionUI ];
@@ -149,6 +148,23 @@ function getDropdownItemsDefinitions( actions ) {
     return itemDefinitions;
 }
 
+const actionList = [
+    // This gets passed to the execute() function at the top
+    { type: 'redflag', tooltip: 'Red Flag', color: '#cd0000' },
+    { type: 'yellowflag', tooltip: 'Yellow Flag', color: '#f5e44c' },
+    { type: 'info', tooltip: 'Info', color: '#083d5a' },
+    { type: 'choosingwisely', tooltip: 'Choosing Wisely', color: '#046caa' },
+    { type: 'valuebasedcare', tooltip: 'Value-Based Care', color: '#10157d' },
+    { type: 'healthequity', tooltip: 'Health Equity', color: '#6000ac' },
+    { type: 'resourcelimited', tooltip: 'Resource Limited', color: '#b23333' },
+    { type: 'digitalhealth', tooltip: 'Digital Health', color: '#12618d' },
+    { type: 'integrativemedicine', tooltip: 'Integrative Medicine', color: '#00634c' },
+    { type: 'reference', tooltip: 'Reference', color: '#000000' },
+];
+
+const typeToTooltip = Object.fromEntries(actionList.map(action => [action.type, action.tooltip]));
+console.log(typeToTooltip);
+
 class ActionEditing extends Plugin {
     static get requires() {
         return [ Widget ];
@@ -166,21 +182,7 @@ class ActionEditing extends Plugin {
             'viewToModelPosition',
             viewToModelPositionOutsideModelElement( this.editor.model, viewElement => viewElement.hasClass( 'action' ) )
         );
-        this.editor.config.define( 'actionConfig', {
-            actions: [
-                // This gets passed to the execute() function at the top
-                { type: 'redflag', tooltip: 'Red Flag', color: '#cd0000' },
-                { type: 'yellowflag', tooltip: 'Yellow Flag', color: '#f5e44c' },
-                { type: 'info', tooltip: 'Info', color: '#083d5a' },
-                { type: 'choosingwisely', tooltip: 'Choosing Wisely', color: '#046caa' },
-                { type: 'valuebasedcare', tooltip: 'Value-Based Care', color: '#10157d' },
-                { type: 'healthequity', tooltip: 'Health Equity', color: '#6000ac' },
-                { type: 'resourcelimited', tooltip: 'Resource Limited', color: '#b23333' },
-                { type: 'digitalhealth', tooltip: 'Digital Health', color: '#12618d' },
-                { type: 'integrativemedicine', tooltip: 'Integrative Medicine', color: '#00634c' },
-                { type: 'reference', tooltip: 'Reference', color: '#000000' },
-            ]
-        } );
+        this.editor.config.define( 'actionConfig', { actions: actionList } );
     }
 
     _defineSchema() {
@@ -257,19 +259,20 @@ class ActionEditing extends Plugin {
         function createActionView( modelItem, viewWriter, isEditing ) {
             const type = modelItem.getAttribute( 'type' );
             const color = modelItem.getAttribute( 'color' );
-            const tooltip = modelItem.getAttribute( 'tooltip' );
+            const id = modelItem.getAttribute( 'id' );
+            const title = typeToTooltip[type];
 
             let child;
             if (!isEditing) {
                 child = [
                     viewWriter.createContainerElement( 'actioncontent', {
-                        type, color, tooltip, class: 'actionNonEditable', id: createRandomId()
+                        type, color, title, class: 'actionNonEditable', id
                     } )
                 ];
             }
 
             const actionView = viewWriter.createContainerElement( 'action', {
-                type, color, tooltip, class: 'actionNonEditable', id: createRandomId()
+                type, color, title: title, class: 'actionNonEditable', id
             }, child );
 
             return actionView;

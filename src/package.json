@@ -41,6 +41,7 @@
     "@ckeditor/ckeditor5-basic-styles": "^35.1.0",
     "@ckeditor/ckeditor5-dev-utils": "^30.4.0",
     "@ckeditor/ckeditor5-dev-webpack-plugin": "^30.4.0",
+    "@ckeditor/ckeditor5-inspector": "^4.1.0",
     "@ckeditor/ckeditor5-theme-lark": "^35.1.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.2.5",

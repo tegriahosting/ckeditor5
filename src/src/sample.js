@@ -7,6 +7,7 @@ import React from 'react';
 import { CKEditor, CKEditorContext } from '@ckeditor/ckeditor5-react';
 import EditorClassicBuild from './editor/ckeditor';
 
+import EditorAnnotations from '@ckeditor/ckeditor5-comments/src/annotations/editorannotations';
 import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
 import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
 import Heading from '@ckeditor/ckeditor5-heading/src/heading';
@@ -14,6 +15,7 @@ import List from '@ckeditor/ckeditor5-list/src/list';
 import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
 import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
 import ActionPlugin from './ActionPlugin.js';
+import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
 
 export default class Sample extends React.Component {
 	state = {
@@ -65,7 +67,7 @@ export default class Sample extends React.Component {
 			collaboration: {
 				channelId: this.state.channelId + '-editor1'
 			},
-			plugins: [ Heading, List, Paragraph, Bold, Italic, Essentials, ActionPlugin ],
+			plugins: [ Heading, List, Paragraph, Bold, Italic, Essentials, EditorAnnotations, ActionPlugin ],
 			toolbar: [ 'heading', 'bold', 'italic', 'numberedList', 'bulletedList', '|', 'action' ]
 		};
 
@@ -104,6 +106,7 @@ export default class Sample extends React.Component {
 										<CKEditor
 											onReady={ editor => {
 												console.log( 'Editor 1 is ready to use!', editor );
+												CKEditorInspector.attach( editor );
 											} }
 											editor={ EditorClassicBuild.ClassicEditor }
 											config={ editorConfig1 }
@@ -118,6 +121,7 @@ export default class Sample extends React.Component {
 										<CKEditor
 											onReady={ editor => {
 												console.log( 'Editor 2 is ready to use!', editor );
+												CKEditorInspector.attach( editor );
 											} }
 											editor={ EditorClassicBuild.ClassicEditor }
 											config={ editorConfig2 }
