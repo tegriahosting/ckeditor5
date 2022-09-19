@@ -8,9 +8,13 @@ import { CKEditor, CKEditorContext } from '@ckeditor/ckeditor5-react';
 import EditorClassicBuild from './editor/ckeditor';
 
 import EditorAnnotations from '@ckeditor/ckeditor5-comments/src/annotations/editorannotations';
+
+import Autoformat from '@ckeditor/ckeditor5-autoformat/src/autoformat';
+import Comments from '@ckeditor/ckeditor5-comments/src/comments';
 import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
 import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
 import Heading from '@ckeditor/ckeditor5-heading/src/heading';
+import Image from '@ckeditor/ckeditor5-image/src/image';
 import List from '@ckeditor/ckeditor5-list/src/list';
 import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
 import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
@@ -67,8 +71,14 @@ export default class Sample extends React.Component {
 			collaboration: {
 				channelId: this.state.channelId + '-editor1'
 			},
-			plugins: [ Heading, List, Paragraph, Bold, Italic, Essentials, EditorAnnotations, ActionPlugin ],
-			toolbar: [ 'heading', 'bold', 'italic', 'numberedList', 'bulletedList', '|', 'action' ]
+			plugins: [ Comments, Heading, List, Paragraph, Bold, Italic, Image, Essentials, EditorAnnotations, ActionPlugin ],
+			toolbar: [ 'heading', 'bold', 'italic', 'numberedList', 'bulletedList', '|', 'action', 'comment', 'link' ],
+			comments: {
+				editorConfig: {
+					// The list of plugins that will be included in the comments editors.
+					extraPlugins: [ Bold, Italic, List, Autoformat ]
+				}
+			},
 		};
 
 		const editorConfig2 = {
@@ -107,6 +117,7 @@ export default class Sample extends React.Component {
 											onReady={ editor => {
 												console.log( 'Editor 1 is ready to use!', editor );
 												CKEditorInspector.attach( editor );
+												console.log( 'Toolbar available:', Array.from( editor.ui.componentFactory.names() ));
 											} }
 											editor={ EditorClassicBuild.ClassicEditor }
 											config={ editorConfig1 }
