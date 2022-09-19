@@ -1,11 +1,9 @@
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
-import { toWidget, viewToModelPositionOutsideModelElement } from '@ckeditor/ckeditor5-widget/src/utils';
+import { toWidget, toWidgetEditable, viewToModelPositionOutsideModelElement } from '@ckeditor/ckeditor5-widget/src/utils';
 import Widget from '@ckeditor/ckeditor5-widget/src/widget';
 import Command from '@ckeditor/ckeditor5-core/src/command';
 
 import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
-import Collection from '@ckeditor/ckeditor5-utils/src/collection';
-import Model from '@ckeditor/ckeditor5-ui/src/model';
 
 import redflag from '../../public/icon_redflag.svg';
 import yellowflag from '../../public/icon_yellowflag.svg';
@@ -64,12 +62,16 @@ console.log(typeToTooltip);
  *
  *   (2) Editting representation ('view'):
  *       <action id="6203058534499425" type="redflag">
- *         <div>Hello!</div>
+ *         <actioncontent class="actionNonEditable" type="redflag" contenteditable="false">
+ *           <div>Hello!</div>
+ *         </actioncontent>
  *       </action>
  *
  *   (3) Internal representation ('model'):
  *       <action id="6203058534499425" type="redflag">
- *         <div>Hello!</div>
+ *         <actioncontent type="redflag">
+ *           <div>Hello!</div>
+ *         </actioncontent>
  *       </action>
  */
 class ActionCommand extends Command {
@@ -94,18 +96,24 @@ class ActionCommand extends Command {
             const frag = editor.model.getSelectedContent( selection );
 
             // Create a <action> element with the "type" attribute (and all the selection attributes)...
+            const actionContent = writer.createElement( 'actionContent', {
+                id: createRandomId(),
+                type
+            });
+            // Create a <action> element with the "type" attribute (and all the selection attributes)...
             const action = writer.createElement( 'action', {
                 id: createRandomId(),
                 type
-            } );
+            });
 
-            // ... and insert it into the document.
-            writer.append( frag, action );
+            writer.append( actionContent, action );
+
+            // insert the selected text into actionContent
+            writer.append( frag, actionContent );
             editor.model.insertContent( action );
 
-
             // Put the selection on the inserted element.
-            writer.setSelection( action, 'on' );
+            writer.setSelection( actionContent, 'on' );
         } );
     }
 
@@ -189,13 +197,32 @@ class ActionEditing extends Plugin {
             allowWhere: '$text',
 
             // The action will act as an inline node:
-            isInline: true,
+            //isInline: true,
 
             // The inline widget is self-contained so it cannot be split by the caret and it can be selected:
             isObject: true,
 
-            // <action type="" id="" title="Red Flag" type="redflag">content</action>
-            allowAttributes: [ 'id', 'class', 'title', 'type' ]
+            // A selection that starts inside should not end outside.
+            // Pressing Backspace or Delete should not delete the area. Pressing Enter should not split the area.
+            //isLimit: true,
+
+            // <action id="" type="redflag"><actioncontent.../></action>
+            allowAttributes: [ 'id', 'type' ]
+        } );
+
+        schema.register( 'actionContent', {
+            // Allowed only inside an action:
+            allowIn: 'action',
+
+            // A selection that starts inside should not end outside.
+            // Pressing Backspace or Delete should not delete the area. Pressing Enter should not split the area.
+            isLimit: true,
+
+            // <actioncontent type="redflag">content</actioncontent>
+            allowAttributes: [ 'type' ],
+
+            // Allow content which is allowed in the root (e.g. paragraphs)
+            allowContentOf: '$root',
         } );
     }
 
@@ -214,7 +241,9 @@ class ActionEditing extends Plugin {
          *
          *   to:
          *       <action id="6203058534499425" type="redflag">
-         *         <div>Hello!</div>
+         *         <actioncontent type="redflag">
+         *           <div>Hello!</div>
+         *         </actioncontent>
          *       </action>
          */
 
@@ -223,14 +252,20 @@ class ActionEditing extends Plugin {
                 name: 'action',
             },
             model: ( viewElement, { writer: modelWriter } ) => {
-
-                console.log('I am here!');
                 const id = viewElement?.getAttribute('id');
                 const type = viewElement?.getAttribute('type');
-                //const content = viewElement?.getChild(0)?.getChild(0    )?.data;
-                // console.log('name, id, type is', text);
-
                 const e = modelWriter.createElement( 'action', { id, type } );
+                return e;
+            }
+        } );
+
+        conversion.for( 'upcast' ).elementToElement( {
+            view: {
+                name: 'actioncontent',
+            },
+            model: ( viewElement, { writer: modelWriter } ) => {
+                const type = viewElement?.getAttribute('type');
+                const e = modelWriter.createElement( 'actionContent', { type } );
                 return e;
             }
         } );
@@ -238,40 +273,57 @@ class ActionEditing extends Plugin {
         conversion.for( 'editingDowncast' ).elementToElement( {
             model: 'action',
             view: ( modelItem, { writer: viewWriter } ) => {
-                const widgetElement = createActionView( modelItem, viewWriter, true );
+                const type = modelItem.getAttribute( 'type' );
+                const id = modelItem.getAttribute( 'id' );
+                const title = typeToTooltip[type];
+
+                const widgetElement = viewWriter.createContainerElement( 'action', {
+                    type, title, class: 'actionNonEditable open', id
+                });
 
                 // Enable widget handling on a action element inside the editing view.
                 return toWidget( widgetElement, viewWriter );
             }
         } );
 
+        conversion.for( 'editingDowncast' ).elementToElement( {
+            model: 'actionContent',
+            view: ( modelItem, { writer: viewWriter } ) => {
+                const type = modelItem.getAttribute( 'type' );
+
+                const widgetElement = viewWriter.createEditableElement( 'actioncontent', {
+                    type, class: 'actionNonEditable'
+                } );
+
+                // Enable widget handling on a action element inside the editing view.
+                return toWidgetEditable( widgetElement, viewWriter );
+            }
+        } );
+
         // When saving the document
         conversion.for( 'dataDowncast' ).elementToElement( {
             model: 'action',
-            view: ( modelItem, { writer: viewWriter } ) => createActionView( modelItem, viewWriter, false )
+            view: ( modelItem, { writer: viewWriter } ) => {
+                const type = modelItem.getAttribute( 'type' );
+                const id = modelItem.getAttribute( 'id' );
+                const title = typeToTooltip[type];
+
+                return viewWriter.createContainerElement( 'action', {
+                    type, title, class: 'actionNonEditable', id
+                });
+            }
         } );
 
-        // Helper method for both downcast converters.
-        function createActionView( modelItem, viewWriter, isEditing ) {
-            const type = modelItem.getAttribute( 'type' );
-            const color = modelItem.getAttribute( 'color' );
-            const id = modelItem.getAttribute( 'id' );
-            const title = typeToTooltip[type];
+        // When saving the document
+        conversion.for( 'dataDowncast' ).elementToElement( {
+            model: 'actionContent',
+            view: ( modelItem, { writer: viewWriter } ) => {
+                const type = modelItem.getAttribute( 'type' );
 
-            let child;
-            if (!isEditing) {
-                child = [
-                    viewWriter.createContainerElement( 'actioncontent', {
-                        type, color, title, class: 'actionNonEditable', id
-                    } )
-                ];
-            }
-
-            const actionView = viewWriter.createContainerElement( 'action', {
-                type, color, title: title, class: 'actionNonEditable', id
-            }, child );
-
-            return actionView;
-        }
+                return viewWriter.createContainerElement( 'actioncontent', {
+                    type, class: 'actionNonEditable'
+                } );
+            },
+        } );
     }
 }
