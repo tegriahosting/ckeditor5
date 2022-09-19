@@ -50,6 +50,9 @@ import NarrowSidebar from '@ckeditor/ckeditor5-comments/src/annotations/narrowsi
 import PresenceList from '@ckeditor/ckeditor5-real-time-collaboration/src/presencelist';
 import WideSidebar from '@ckeditor/ckeditor5-comments/src/annotations/widesidebar';
 
+// Tegria custom plugin
+import ActionPlugin from './ActionPlugin.js';
+
 import * as CKBox from 'ckbox';
 import 'ckbox/dist/styles/ckbox.css';
 
@@ -76,6 +79,7 @@ Context.builtinPlugins = [
 class ClassicEditor extends BaseClassicEditor {}
 
 ClassicEditor.builtinPlugins = [
+	ActionPlugin,
 	Alignment,
 	Autoformat,
 	BlockQuote,
@@ -115,15 +119,15 @@ ClassicEditor.defaultConfig = {
 	toolbar: [
 		'heading',
 		'|',
-		'fontsize',
-		'fontfamily',
-		'|',
+		//'fontsize',
+		//'fontfamily',
+		//'|',
 		'bold',
 		'italic',
 		'underline',
 		'strikethrough',
 		'removeFormat',
-		'highlight',
+//		'highlight',
 		'|',
 		'alignment',
 		'|',
@@ -133,6 +137,7 @@ ClassicEditor.defaultConfig = {
 		'undo',
 		'redo',
 		'|',
+		'action',
 		'comment',
 		'trackChanges',
 		'|',

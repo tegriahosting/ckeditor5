@@ -5,7 +5,7 @@
 
 import React, { Component } from 'react';
 import ConfigurationDialog from './configuration-dialog/configuration-dialog';
-import Sample from './sample';
+import EditorComponent from './EditorComponent';
 
 export default class App extends Component {
 	state = {
@@ -25,6 +25,6 @@ export default class App extends Component {
 			return <ConfigurationDialog onSubmit={ configuration => this.setState( { configuration } ) } />;
 		}
 
-		return <Sample configuration={ this.state.configuration } />;
+		return <EditorComponent configuration={ this.state.configuration } />;
 	}
 }

@@ -4,12 +4,12 @@
  */
 
 :root {
-	--ck-sample-base-spacing: 2em;
-	--ck-sample-color-white: #fff;
-	--ck-sample-color-green: #279863;
-	--ck-sample-container-width: 1285px;
-	--ck-sample-sidebar-width: 290px;
-	--ck-sample-editor-min-height: 200px;
+	--ck-editorComponent-base-spacing: 2em;
+	--ck-editorComponent-color-white: #fff;
+	--ck-editorComponent-color-green: #279863;
+	--ck-editorComponent-container-width: 1285px;
+	--ck-editorComponent-sidebar-width: 290px;
+	--ck-editorComponent-editor-min-height: 200px;
 }
 
 body, html {
@@ -66,19 +66,19 @@ main .ck.ck-editor {
 .centered {
 	/* Hide overlapping comments. */
 	overflow: hidden;
-	max-width: var(--ck-sample-container-width);
+	max-width: var(--ck-editorComponent-container-width);
 	margin: 0 auto;
-	padding: 0 var(--ck-sample-base-spacing);
+	padding: 0 var(--ck-editorComponent-base-spacing);
 }
 
-.sample-wrapper {
+.editorComponent-wrapper {
 	display: flex;
     justify-content: space-between;
     position: relative;
     width: 100%;
 }
 
-.sample-content {
+.editorComponent-content {
     max-width: 960px;
     margin: 30px auto 0px auto;
 }
@@ -96,7 +96,7 @@ main .ck.ck-editor {
 	box-shadow: none;
 	min-height: 100%;
 	font-size: 20px;
-	min-width: var(--ck-sample-sidebar-width);
+	min-width: var(--ck-editorComponent-sidebar-width);
 }
 
 .sidebar.narrow {
@@ -111,7 +111,7 @@ main .ck.ck-editor {
 	height: 100%;
 }
 
-.sample-sidebar {
+.editorComponent-sidebar {
 	position: relative;
     min-height: 100vh;
     width: 400px;
@@ -206,11 +206,11 @@ main .ck-editor[role='application'] .ck.ck-content {
 	background: #fff;
 	font-size: 1em;
 	line-height: 1.6em;
-	min-height: var(--ck-sample-editor-min-height);
+	min-height: var(--ck-editorComponent-editor-min-height);
 	padding: 1.5em 2em;
 }
 
-/* --------- SAMPLE GENERIC STYLES ---------------------------------------------------------------------------- */
+/* --------- editorComponent GENERIC STYLES ---------------------------------------------------------------------------- */
 header .centered {
 	display: flex;
 	flex-flow: row nowrap;
@@ -257,9 +257,9 @@ header nav ul li a:hover {
 }
 
 main .message {
-	padding: 0 0 var(--ck-sample-base-spacing);
-	background: var(--ck-sample-color-green);
-	color: var(--ck-sample-color-white);
+	padding: 0 0 var(--ck-editorComponent-base-spacing);
+	background: var(--ck-editorComponent-color-green);
+	color: var(--ck-editorComponent-color-white);
 }
 
 main .message h2 {
@@ -269,7 +269,7 @@ main .message h2 {
 }
 
 footer {
-	margin: calc(2*var(--ck-sample-base-spacing)) var(--ck-sample-base-spacing);
+	margin: calc(2*var(--ck-editorComponent-base-spacing)) var(--ck-editorComponent-base-spacing);
 	font-size: .8em;
 	text-align: center;
 	color: rgba(0,0,0,.4);
@@ -278,7 +278,7 @@ footer {
 /* --------- RWD ---------- */
 @media screen and ( max-width: 800px ) {
 	:root {
-		--ck-sample-base-spacing: 1em;
+		--ck-editorComponent-base-spacing: 1em;
 	}
 
 	header h1 {

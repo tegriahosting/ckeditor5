@@ -6,22 +6,9 @@
 import React from 'react';
 import { CKEditor, CKEditorContext } from '@ckeditor/ckeditor5-react';
 import EditorClassicBuild from './editor/ckeditor';
-
-import EditorAnnotations from '@ckeditor/ckeditor5-comments/src/annotations/editorannotations';
-
-import Autoformat from '@ckeditor/ckeditor5-autoformat/src/autoformat';
-import Comments from '@ckeditor/ckeditor5-comments/src/comments';
-import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
-import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
-import Heading from '@ckeditor/ckeditor5-heading/src/heading';
-import Image from '@ckeditor/ckeditor5-image/src/image';
-import List from '@ckeditor/ckeditor5-list/src/list';
-import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
-import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
-import ActionPlugin from './ActionPlugin.js';
 import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
 
-export default class Sample extends React.Component {
+export default class EditorComponent extends React.Component {
 	state = {
 		// You need this state to render the <CKEditor /> component after the layout is ready.
 		// <CKEditor /> needs HTMLElements of `Sidebar` and `PresenceList` plugins provided through
@@ -71,14 +58,6 @@ export default class Sample extends React.Component {
 			collaboration: {
 				channelId: this.state.channelId + '-editor1'
 			},
-			plugins: [ Comments, Heading, List, Paragraph, Bold, Italic, Image, Essentials, EditorAnnotations, ActionPlugin ],
-			toolbar: [ 'heading', 'bold', 'italic', 'numberedList', 'bulletedList', '|', 'action', 'comment', 'link' ],
-			comments: {
-				editorConfig: {
-					// The list of plugins that will be included in the comments editors.
-					extraPlugins: [ Bold, Italic, List, Autoformat ]
-				}
-			},
 		};
 
 		const editorConfig2 = {
@@ -91,8 +70,8 @@ export default class Sample extends React.Component {
 		return (
 			<div className="App">
 				<main>
-					<div className="sample-wrapper">
-						<div className="sample-content">
+					<div className="editorComponent-wrapper">
+						<div className="editorComponent-content">
 							<h2>Form controls</h2>
 
 							<div className="custom-controls" ref={ this.controlsRef }>
@@ -142,7 +121,7 @@ export default class Sample extends React.Component {
 							</CKEditorContext>
 						</div>
 
-						<div className="sample-sidebar">
+						<div className="editorComponent-sidebar">
 							<div className="row row-presence">
 								<div ref={ this.presenceListElementRef } className="presence"></div>
 							</div>
