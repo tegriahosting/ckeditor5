@@ -58,6 +58,10 @@ export default class EditorComponent extends React.Component {
 			collaboration: {
 				channelId: this.state.channelId + '-editor1'
 			},
+			link: {
+				// Automatically add target="_blank" and rel="noopener noreferrer" to all external links.
+				addTargetToExternalLinks: true,
+			}
 		};
 
 		const editorConfig2 = {
