@@ -3,9 +3,21 @@ import { toWidget, viewToModelPositionOutsideModelElement } from '@ckeditor/cked
 import Widget from '@ckeditor/ckeditor5-widget/src/widget';
 import Command from '@ckeditor/ckeditor5-core/src/command';
 
-import { addListToDropdown, createDropdown } from '@ckeditor/ckeditor5-ui/src/dropdown/utils';
+import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
 import Collection from '@ckeditor/ckeditor5-utils/src/collection';
 import Model from '@ckeditor/ckeditor5-ui/src/model';
+
+import redflag from '../../public/icon_redflag.svg';
+import yellowflag from '../../public/icon_yellowflag.svg';
+import info from '../../public/icon_info.svg';
+import choosingwisely from '../../public/icon_choosingwisely.svg';
+import valuebasedcare from '../../public/icon_valuebasedcare.svg';
+import healthequity from '../../public/icon_healthequity.svg';
+import resourcelimited from '../../public/icon_resourcelimited.svg';
+import digitalhealth from '../../public/icon_digitalhealth.svg';
+import integrativemedicine from '../../public/icon_integrativemedicine.svg';
+import reference from '../../public/icon_reference.svg';
+
 export default class ActionPlugin extends Plugin {
     static get requires() {
         return [ ActionEditing, ActionUI ];
@@ -15,6 +27,23 @@ export default class ActionPlugin extends Plugin {
 function createRandomId() {
     return Math.round(Math.random() * Number.MAX_SAFE_INTEGER).toString();
 }
+
+const actionList = [
+    // This gets passed to the execute() function at the top
+    { type: 'redflag', tooltip: 'Red Flag', background: '#ffcfd0', color: '#cd0000', icon: redflag},
+    { type: 'yellowflag', tooltip: 'Yellow Flag', background: '#fffbdc', color: '#f5e44c', icon: yellowflag},
+    { type: 'info', tooltip: 'Info', background: '#f9fafc', color: '#083d5a', icon: info},
+    { type: 'choosingwisely', tooltip: 'Choosing Wisely', background: '#fff8e1', color: '#046caa', icon: choosingwisely},
+    { type: 'valuebasedcare', tooltip: 'Value-Based Care', background: '#e8e8fe', color: '#10157d', icon: valuebasedcare},
+    { type: 'healthequity', tooltip: 'Health Equity', background: '#ecd6ff', color: '#6000ac', icon: healthequity},
+    { type: 'resourcelimited', tooltip: 'Resource Limited', background: '#ffd7d7', color: '#b23333', icon: resourcelimited},
+    { type: 'digitalhealth', tooltip: 'Digital Health', background: '#e6f6ff', color: '#12618d', icon: digitalhealth},
+    { type: 'integrativemedicine', tooltip: 'Integrative Medicine', background: '#dcfff7', color: '#00634c', icon: integrativemedicine},
+    { type: 'reference', tooltip: 'Reference', background: '#f5f5f5', color: '#000000', icon: reference},
+];
+
+const typeToTooltip = Object.fromEntries(actionList.map(action => [action.type, action.tooltip]));
+console.log(typeToTooltip);
 
 /**
  * An action (aka 'icon') has a type (e.g. redflag), and some html content.
@@ -98,72 +127,39 @@ class ActionUI extends Plugin {
 
         // The "action" dropdown must be registered among the UI components of the editor
         // to be displayed in the toolbar.
-        editor.ui.componentFactory.add( 'action', locale => {
-            const dropdownView = createDropdown( locale );
+        actionList.map(action =>
+            editor.ui.componentFactory.add( `action-${action.type}`, locale => {
+                const view = new ButtonView( locale );
+                view.set( {
+                    label: action.tooltip,
+                    icon: action.icon,
+                    tooltip: true,
+                    withText: false
+                } );
 
-            // Populate the list in the dropdown with items.
-            addListToDropdown( dropdownView, getDropdownItemsDefinitions( actions ) );
+                view.extendTemplate( {
+                    attributes: {
+                        class: 'ck-reset_all-excluded actionToolbarButton',
+                        style: `background: ${action.background}; padding: 3px; box-sizing: content-box; margin: 0;`
+                    }
+                } );
 
-            dropdownView.buttonView.set( {
-                // The t() function helps localize the editor. All strings enclosed in t() can be
-                // translated and change when the language of the editor changes.
-                label: t( 'Flags' ),
-                tooltip: true,
-                withText: true
-            } );
+                // Disable the action button when the command is disabled.
+                const command = editor.commands.get( 'action' );
+                view.bind( 'isEnabled' ).to( command );
 
-            // Disable the action button when the command is disabled.
-            const command = editor.commands.get( 'action' );
-            dropdownView.bind( 'isEnabled' ).to( command );
+                // Execute the command when the button is clicked (executed).
+                this.listenTo( view, 'execute', evt => {
+                    console.log('Clicked on action: ', action);
+                    editor.execute( 'action', action);
+                    editor.editing.view.focus();
+                } );
 
-            // Execute the command when the dropdown item is clicked (executed).
-            this.listenTo( dropdownView, 'execute', evt => {
-                console.log('got', evt.source.commandParam);
-                editor.execute( 'action', evt.source.commandParam);
-                editor.editing.view.focus();
-            } );
-
-            return dropdownView;
-        } );
-    }
-}
-
-function getDropdownItemsDefinitions( actions ) {
-    const itemDefinitions = new Collection();
-
-    for ( const action of actions ) {
-        const definition = {
-            type: 'button',
-            model: new Model( {
-                commandParam: action,
-                label: action.tooltip,
-                withText: true
+                return view;
             } )
-        };
-
-        // Add the item definition to the collection.
-        itemDefinitions.add( definition );
+        );
     }
-
-    return itemDefinitions;
 }
-
-const actionList = [
-    // This gets passed to the execute() function at the top
-    { type: 'redflag', tooltip: 'Red Flag', color: '#cd0000' },
-    { type: 'yellowflag', tooltip: 'Yellow Flag', color: '#f5e44c' },
-    { type: 'info', tooltip: 'Info', color: '#083d5a' },
-    { type: 'choosingwisely', tooltip: 'Choosing Wisely', color: '#046caa' },
-    { type: 'valuebasedcare', tooltip: 'Value-Based Care', color: '#10157d' },
-    { type: 'healthequity', tooltip: 'Health Equity', color: '#6000ac' },
-    { type: 'resourcelimited', tooltip: 'Resource Limited', color: '#b23333' },
-    { type: 'digitalhealth', tooltip: 'Digital Health', color: '#12618d' },
-    { type: 'integrativemedicine', tooltip: 'Integrative Medicine', color: '#00634c' },
-    { type: 'reference', tooltip: 'Reference', color: '#000000' },
-];
-
-const typeToTooltip = Object.fromEntries(actionList.map(action => [action.type, action.tooltip]));
-console.log(typeToTooltip);
 
 class ActionEditing extends Plugin {
     static get requires() {

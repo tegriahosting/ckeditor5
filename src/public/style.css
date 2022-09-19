@@ -38,6 +38,16 @@ a {
 	width: 105px !important;
 }
 
+.actionToolbarButton {
+	transition: all 0.2s ease !important;
+}
+
+.actionToolbarButton:hover {
+	background: transparent !important;
+	margin-bottom: 6px !important;
+	margin-top: -6px !important;
+	filter: brightness(1.2);
+}
 /* --------- STYLES TO DISPLAY THE EDITOR BEFORE LOAD ---------------------------------------------------------------------------- */
 
 .row-editor > div:first-child{
