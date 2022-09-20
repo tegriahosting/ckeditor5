@@ -111,14 +111,10 @@ class ActionCommand extends Command {
             // insert the selected text into actionContent
             writer.append( frag, actionContent );
 
-            // There must be at least one paragraph for the description to be editable.
-            // See https://github.com/ckeditor/ckeditor5/issues/1464.
-            writer.appendElement( 'paragraph', actionContent );
-
             editor.model.insertContent( action );
 
             // Put the selection on the inserted element.
-            writer.setSelection( actionContent, 'on' );
+            writer.setSelection( actionContent, 'in' );
         } );
     }
 
@@ -135,8 +131,6 @@ class ActionCommand extends Command {
 class ActionUI extends Plugin {
     init() {
         const editor = this.editor;
-        const t = editor.t;
-        const actions = editor.config.get( 'actionConfig.actions' );
 
         // The "action" dropdown must be registered among the UI components of the editor
         // to be displayed in the toolbar.
@@ -202,7 +196,7 @@ class ActionEditing extends Plugin {
             allowWhere: '$text',
 
             // The action will act as an inline node:
-            isInline: true,
+            //isInline: true,
 
             // The inline widget is self-contained so it cannot be split by the caret and it can be selected:
             isObject: true,
@@ -227,6 +221,7 @@ class ActionEditing extends Plugin {
             allowAttributes: [ 'type' ],
 
             // Allow content which is allowed in the root (e.g. paragraphs)
+            allowChildren: '$text',
             allowContentOf: '$root',
         } );
     }

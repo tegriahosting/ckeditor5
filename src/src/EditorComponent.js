@@ -64,13 +64,6 @@ export default class EditorComponent extends React.Component {
 			}
 		};
 
-		const editorConfig2 = {
-			initialData: this.getInitialData(),
-			collaboration: {
-				channelId: this.state.channelId + '-editor2'
-			}
-		};
-
 		return (
 			<div className="App">
 				<main>
@@ -92,33 +85,15 @@ export default class EditorComponent extends React.Component {
 								id={ this.state.channelId }
 								isLayoutReady={ this.state.isLayoutReady }>
 
-								<h2>Editor 1</h2>
-
 								<div className="row row-editor">
 									{ this.state.isLayoutReady && (
 										<CKEditor
 											onReady={ editor => {
-												console.log( 'Editor 1 is ready to use!', editor );
+												console.log( 'Editor is ready to use!', editor );
 												CKEditorInspector.attach( editor );
-												console.log( 'Toolbar available:', Array.from( editor.ui.componentFactory.names() ));
 											} }
 											editor={ EditorClassicBuild.ClassicEditor }
 											config={ editorConfig1 }
-										/>
-									)}
-								</div>
-
-								<h2>Editor 2</h2>
-
-								<div className="row row-editor">
-									{ this.state.isLayoutReady && (
-										<CKEditor
-											onReady={ editor => {
-												console.log( 'Editor 2 is ready to use!', editor );
-												CKEditorInspector.attach( editor );
-											} }
-											editor={ EditorClassicBuild.ClassicEditor }
-											config={ editorConfig2 }
 										/>
 									)}
 								</div>
@@ -135,17 +110,6 @@ export default class EditorComponent extends React.Component {
 						</div>
 					</div>
 				</main>
-
-				<footer>
-					<div className="centered">
-						<p>
-							<a href="https://ckeditor.com/ckeditor-5/" target="_blank" rel="noopener noreferrer">CKEditor 5</a> – Rich text editor of tomorrow, available today
-						</p>
-						<p>
-							Copyright © 2003-2022, <a href="https://cksource.com/" target="_blank" rel="noopener noreferrer">CKSource</a> Holding sp. z o.o. All rights reserved.
-						</p>
-					</div>
-				</footer>
 			</div>
 		);
 	}
