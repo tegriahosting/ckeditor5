@@ -110,6 +110,11 @@ class ActionCommand extends Command {
 
             // insert the selected text into actionContent
             writer.append( frag, actionContent );
+
+            // There must be at least one paragraph for the description to be editable.
+            // See https://github.com/ckeditor/ckeditor5/issues/1464.
+            writer.appendElement( 'paragraph', actionContent );
+
             editor.model.insertContent( action );
 
             // Put the selection on the inserted element.
@@ -197,14 +202,14 @@ class ActionEditing extends Plugin {
             allowWhere: '$text',
 
             // The action will act as an inline node:
-            //isInline: true,
+            isInline: true,
 
             // The inline widget is self-contained so it cannot be split by the caret and it can be selected:
             isObject: true,
 
             // A selection that starts inside should not end outside.
             // Pressing Backspace or Delete should not delete the area. Pressing Enter should not split the area.
-            //isLimit: true,
+            isLimit: true,
 
             // <action id="" type="redflag"><actioncontent.../></action>
             allowAttributes: [ 'id', 'type' ]
