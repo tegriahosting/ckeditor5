@@ -16,6 +16,8 @@ import digitalhealth from '../../public/icon_digitalhealth.svg';
 import integrativemedicine from '../../public/icon_integrativemedicine.svg';
 import reference from '../../public/icon_reference.svg';
 
+const CAN_EDIT_ACTIONS = false;
+
 export default class ActionPlugin extends Plugin {
     static get requires() {
         return [ ActionEditing, ActionUI ];
@@ -90,31 +92,27 @@ class ActionCommand extends Command {
         const editor = this.editor;
         const selection = editor.model.document.selection;
 
-        editor.model.change( writer => {
+        editor.model.change( modelWriter => {
             console.log('selection is', selection, Object.fromEntries(selection.getAttributes()));
 
             const frag = editor.model.getSelectedContent( selection );
 
-            // Create a <action> element with the "type" attribute (and all the selection attributes)...
-            const actionContent = writer.createElement( 'actionContent', {
-                id: createRandomId(),
-                type
-            });
-            // Create a <action> element with the "type" attribute (and all the selection attributes)...
-            const action = writer.createElement( 'action', {
+            const p = modelWriter.createElement( 'p');
+            const actionContent = modelWriter.createElement( 'actionContent', { type });
+            const action = modelWriter.createElement( 'action', {
                 id: createRandomId(),
                 type
             });
 
-            writer.append( actionContent, action );
 
-            // insert the selected text into actionContent
-            writer.append( frag, actionContent );
-
+            // insert the selected text into p inside actionContent
+            modelWriter.append( frag, p );
+            modelWriter.append( p, actionContent);
+            modelWriter.append( actionContent, action );
             editor.model.insertContent( action );
 
             // Put the selection on the inserted element.
-            writer.setSelection( actionContent, 'in' );
+            modelWriter.setSelection( p, 'in' );
         } );
     }
 
@@ -213,10 +211,6 @@ class ActionEditing extends Plugin {
             // Allowed only inside an action:
             allowIn: 'action',
 
-            // A selection that starts inside should not end outside.
-            // Pressing Backspace or Delete should not delete the area. Pressing Enter should not split the area.
-            isLimit: true,
-
             // <actioncontent type="redflag">content</actioncontent>
             allowAttributes: [ 'type' ],
 
@@ -241,19 +235,95 @@ class ActionEditing extends Plugin {
          *
          *   to:
          *       <action id="6203058534499425" type="redflag">
-         *         <actioncontent type="redflag">
+         *         <p type="redflag">
          *           <div>Hello!</div>
-         *         </actioncontent>
+         *         </p>
          *       </action>
          */
+        conversion.for( 'upcast' ).add( dispatcher => {
+            dispatcher.on( 'element:action', ( evt, data, conversionApi ) => {
+                // Get all the necessary items from the conversion API object.
+                const {
+                    consumable,
+                    writer: modelWriter,
+                    safeInsert,
+                    convertChildren,
+                    updateConversionResult
+                } = conversionApi;
 
-        conversion.for( 'upcast' ).elementToElement( {
+                // Get view item from data object.
+                const { viewItem } = data;
+
+                // Define elements consumables.
+                const wrapper = { name: true };
+                const innerWrapper = { name: true };
+                console.log('action was pasted in!  viewItem is', viewItem);
+                const id = viewItem.getAttribute('id') || createRandomId();
+                const type = viewItem.getAttribute('type') || 'redflag';
+
+                // Tests if the view element can be consumed.
+                if ( !consumable.test( viewItem, wrapper ) ) {
+                    console.warn(`action(${type}#${id})  is not consumable!`);
+                    return;
+                }
+
+                // Create model element.
+                const actionContent = modelWriter.createElement( 'actionContent', { type });
+                const action = modelWriter.createElement( 'action', { id, type }, [ actionContent ] );
+
+                // Consume the main outer wrapper element.
+                consumable.consume( viewItem, wrapper );
+
+                // Insert element on a current cursor location.
+                if ( !safeInsert( action, data.modelCursor ) ) {
+                    console.warn('It is not safe to insert the action..!?');
+                    return;
+                }
+                const innerPosition = data.modelCursor.getShiftedBy( action.offsetSize );
+                if ( !safeInsert( actionContent, innerPosition ) ) {
+                    console.warn('It is not safe to insert the actioncontent..!?');
+                    return;
+                }
+
+
+                for (const childItem of viewItem.getChildren()) {
+                    // Should be only one child (actioncontent), but try to be robust against bad input and look for the first actioncontent.
+                    if ( !consumable.test( childItem, innerWrapper ) ) {
+                        console.warn(`actions(${type}#${id}) child was not consumable!?`);
+                        continue;
+                    }
+
+
+                    // Check if the element is an actioncontent - which it should be
+                    if ( !childItem.is( 'element', 'actioncontent' ) ) {
+                        console.warn(`actions(${type}#${id}) child was not actioncontent!?`);
+                        continue;
+                    }
+
+                    // Consume the inner wrapper element.
+                    consumable.consume( childItem, innerWrapper );
+
+                    // Handle children conversion inside inner wrapper element.
+                    convertChildren( childItem, actionContent );
+                    console.log('successfully added actioncontent');
+                }
+
+                console.log('successfully added action');
+
+                // Necessary function call to help setting model range and cursor
+                // for some specific cases when elements being split.
+                updateConversionResult( action, data );
+            } );
+        });
+
+
+/*        conversion.for( 'upcast' ).elementToElement( {
             view: {
-                name: 'action',
+                name: 'action2',
             },
             model: ( viewElement, { writer: modelWriter } ) => {
-                const id = viewElement?.getAttribute('id');
-                const type = viewElement?.getAttribute('type');
+                const id = viewElement?.getAttribute('id') || createRandomId();
+                const type = viewElement?.getAttribute('type') || 'redflag';
                 const e = modelWriter.createElement( 'action', { id, type } );
                 return e;
             }
@@ -266,13 +336,15 @@ class ActionEditing extends Plugin {
             model: ( viewElement, { writer: modelWriter } ) => {
                 const type = viewElement?.getAttribute('type');
                 const e = modelWriter.createElement( 'actionContent', { type } );
+                console.log('upcast actioncontent! from', type);
                 return e;
             }
-        } );
+        } );*/
 
         conversion.for( 'editingDowncast' ).elementToElement( {
             model: 'action',
             view: ( modelItem, { writer: viewWriter } ) => {
+                console.log('editingDowncast action', modelItem);
                 const type = modelItem.getAttribute( 'type' );
                 const id = modelItem.getAttribute( 'id' );
                 const title = typeToTooltip[type];
@@ -289,14 +361,24 @@ class ActionEditing extends Plugin {
         conversion.for( 'editingDowncast' ).elementToElement( {
             model: 'actionContent',
             view: ( modelItem, { writer: viewWriter } ) => {
+                console.log('editingDowncast actionContent', modelItem);
                 const type = modelItem.getAttribute( 'type' );
 
-                const widgetElement = viewWriter.createEditableElement( 'actioncontent', {
-                    type, class: 'actionNonEditable'
-                } );
+                if (CAN_EDIT_ACTIONS) {
+                    const widgetElement = viewWriter.createEditableElement( 'actioncontent', {
+                        type, class: 'actionNonEditable'
+                    } );
 
-                // Enable widget handling on a action element inside the editing view.
-                return toWidgetEditable( widgetElement, viewWriter );
+                    // Enable widget handling on a action element inside the editing view.
+                    return toWidgetEditable( widgetElement, viewWriter );
+                } else {
+                    const widgetElement = viewWriter.createContainerElement( 'actioncontent', {
+                        type, class: 'actionNonEditable'
+                    } );
+
+                    // Enable widget handling on a action element inside the editing view.
+                    return toWidget( widgetElement, viewWriter );
+                }
             }
         } );
 
@@ -304,6 +386,7 @@ class ActionEditing extends Plugin {
         conversion.for( 'dataDowncast' ).elementToElement( {
             model: 'action',
             view: ( modelItem, { writer: viewWriter } ) => {
+                console.log('dataDowncast', modelItem);
                 const type = modelItem.getAttribute( 'type' );
                 const id = modelItem.getAttribute( 'id' );
                 const title = typeToTooltip[type];
