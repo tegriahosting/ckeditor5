@@ -56,6 +56,8 @@ import ActionPlugin from './ActionPlugin.js';
 import * as CKBox from 'ckbox';
 import 'ckbox/dist/styles/ckbox.css';
 
+export const enableColab = false;
+
 class Context extends BaseContext {}
 
 Context.defaultConfig = {
@@ -67,18 +69,18 @@ Context.defaultConfig = {
 	}
 };
 
-Context.builtinPlugins = [
+Context.builtinPlugins = enableColab ? [
 	CloudServices,
 	CloudServicesCommentsAdapter,
 	CommentsRepository,
 	NarrowSidebar,
 	PresenceList,
 	WideSidebar
-];
+] : [];
 
 class ClassicEditor extends BaseClassicEditor {}
 
-ClassicEditor.builtinPlugins = [
+ClassicEditor.builtinPlugins = enableColab ? [
 	ActionPlugin,
 	Alignment,
 	Autoformat,
@@ -113,9 +115,38 @@ ClassicEditor.builtinPlugins = [
 	TableToolbar,
 	TrackChanges,
 	Underline
+] : [
+	ActionPlugin,
+	Alignment,
+	Autoformat,
+	BlockQuote,
+	Bold,
+	PictureEditing,
+	Essentials,
+	FontFamily,
+	FontSize,
+	Heading,
+	Highlight,
+	Image,
+	ImageCaption,
+	ImageResize,
+	ImageStyle,
+	ImageToolbar,
+	ImageUpload,
+	Italic,
+	Link,
+	List,
+	MediaEmbed,
+	Paragraph,
+	PasteFromOffice,
+	RemoveFormat,
+	Strikethrough,
+	Table,
+	TableToolbar,
+	Underline
 ];
 
-ClassicEditor.defaultConfig = {
+ClassicEditor.defaultConfig = enableColab ? {
 	toolbar: [
 		'heading',
 		'|',
@@ -180,6 +211,64 @@ ClassicEditor.defaultConfig = {
 	mediaEmbed: {
 		toolbar: [ 'comment' ]
 	}
+} : {
+	toolbar: [
+		'heading',
+		'|',
+		//'fontsize',
+		//'fontfamily',
+		//'|',
+		'bold',
+		'italic',
+		'underline',
+		'strikethrough',
+		'removeFormat',
+//		'highlight',
+		'|',
+		'alignment',
+		'|',
+		'numberedList',
+		'bulletedList',
+		'|',
+		'undo',
+		'redo',
+		'|',
+		'action-redflag',
+		'action-yellowflag',
+		'action-info',
+		'action-choosingwisely',
+		'action-valuebasedcare',
+		'action-healthequity',
+		'action-resourcelimited',
+		'action-digitalhealth',
+		'action-integrativemedicine',
+		'action-reference',
+		'|',
+		'ckbox',
+		'imageUpload',
+		'link',
+		'blockquote',
+		'insertTable',
+		'mediaEmbed'
+	],
+	image: {
+		toolbar: [
+			'imageStyle:inline',
+			'imageStyle:block',
+			'imageStyle:side',
+			'|',
+			'imageTextAlternative',
+			'|',
+			'comment'
+		]
+	},
+	table: {
+		contentToolbar: [
+			'tableColumn',
+			'tableRow',
+			'mergeTableCells'
+		]
+	},
 };
 
 export default {

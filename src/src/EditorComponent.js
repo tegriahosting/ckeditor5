@@ -7,6 +7,7 @@ import React from 'react';
 import { CKEditor, CKEditorContext } from '@ckeditor/ckeditor5-react';
 import EditorClassicBuild from './editor/ckeditor';
 import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
+import { enableColab } from './editor/ckeditor';
 
 export default class EditorComponent extends React.Component {
 	state = {
@@ -14,7 +15,7 @@ export default class EditorComponent extends React.Component {
 		// <CKEditor /> needs HTMLElements of `Sidebar` and `PresenceList` plugins provided through
 		// the `config` property and you have to ensure that both are already rendered.
 		isLayoutReady: false,
-		channelId: this.props.configuration.channelId
+		channelId: this.props.configuration?.channelId
 	};
 
 	context = null;
@@ -34,7 +35,7 @@ export default class EditorComponent extends React.Component {
 
 	render() {
 		const cloudServicesConfig = this.props.configuration;
-		const contextConfig = {
+		const contextConfig = cloudServicesConfig ? {
 			cloudServices: {
 				tokenUrl: cloudServicesConfig.tokenUrl,
 				webSocketUrl: cloudServicesConfig.webSocketUrl
@@ -51,7 +52,7 @@ export default class EditorComponent extends React.Component {
 			presenceList: {
 				container: this.presenceListElementRef.current
 			}
-		};
+		} : undefined;
 
 		const editorConfig1 = {
 			initialData: this.getInitialData(),
@@ -117,8 +118,9 @@ export default class EditorComponent extends React.Component {
 	onContextReady( context ) {
 		if ( this.context !== context ) {
 			this.context = context;
-
-			this.initIntegration( context );
+			if (enableColab) {
+				this.initIntegration( context );
+			}
 		}
 	}
 
