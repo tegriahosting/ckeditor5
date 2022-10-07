@@ -257,8 +257,6 @@ ClassicEditor.defaultConfig = enableColab ? {
 			'imageStyle:side',
 			'|',
 			'imageTextAlternative',
-			'|',
-			'comment'
 		]
 	},
 	table: {
