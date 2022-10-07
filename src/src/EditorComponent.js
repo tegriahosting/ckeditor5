@@ -239,7 +239,7 @@ export default class EditorComponent extends React.Component {
 		return `
 			<h2>Bilingual Personality Disorder</h2>
 			<p>
-				This may be the first time you hear about this made-up disorder but it actually isn’t so far from the truth. Even the studies
+				This may be the first time you hear about this made-up disorder but it actually isn’t so far from the truth<action type="info"><actioncontent><p>Hmm</p></actioncontent></action>. Even the studies
 				that were conducted almost half a century show that <strong>the language you speak has more effects on you than you realize</strong>.
 			</p>
 			<p>

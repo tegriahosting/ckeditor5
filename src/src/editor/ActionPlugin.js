@@ -97,7 +97,7 @@ class ActionCommand extends Command {
 
             const frag = editor.model.getSelectedContent( selection );
 
-            const p = modelWriter.createElement( 'p');
+            const p = modelWriter.createElement( 'paragraph');
             const actionContent = modelWriter.createElement( 'actionContent', { type });
             const action = modelWriter.createElement( 'action', {
                 id: createRandomId(),
@@ -353,8 +353,12 @@ class ActionEditing extends Plugin {
                     type, title, class: 'actionNonEditable open', id
                 });
 
+                if (CAN_EDIT_ACTIONS) {
                 // Enable widget handling on a action element inside the editing view.
                 return toWidget( widgetElement, viewWriter );
+                } else {
+                    return widgetElement;
+                }
             }
         } );
 
@@ -377,7 +381,7 @@ class ActionEditing extends Plugin {
                     } );
 
                     // Enable widget handling on a action element inside the editing view.
-                    return toWidget( widgetElement, viewWriter );
+                    return widgetElement;
                 }
             }
         } );

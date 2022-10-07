@@ -244,7 +244,6 @@ ClassicEditor.defaultConfig = enableColab ? {
 		'action-integrativemedicine',
 		'action-reference',
 		'|',
-		'ckbox',
 		'imageUpload',
 		'link',
 		'blockquote',
